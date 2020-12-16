@@ -1,0 +1,78 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+group = 'io.digdag.plugin'
+version = '0.1.0'
+
+def digdagVersion = '0.9.42'
+def prometheusVersion = '0.9.0'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven {
+        url 'https://dl.bintray.com/digdag/maven'
+    }
+}
+
+configurations {
+    provided
+}
+
+dependencies {
+    compile 'io.prometheus:simpleclient_pushgateway:' + prometheusVersion
+    provided 'io.digdag:digdag-spi:' + digdagVersion
+    // provided 'io.digdag:digdag-standards:' + digdagVersion
+    provided 'io.digdag:digdag-plugin-utils:' + digdagVersion
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+        test.compileClasspath += configurations.provided
+        test.runtimeClasspath += configurations.provided
+    }
+}
+
+eclipse {
+    classpath {
+        plusConfigurations += [ configurations.provided ]
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            // artifactId 'project1-sample'        
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "$buildDir/repo"
+        }
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+javadoc {
+    options {
+        locale = 'en_US'
+        encoding = 'UTF-8'
+    }
+}
+

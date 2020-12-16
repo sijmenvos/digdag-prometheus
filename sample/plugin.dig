@@ -1,0 +1,9 @@
+_export:
+  plugin:
+    dependencies:
+      - io.digdag.plugin:digdag-prometheus:0.1.0
+  pushgateway_url: http://localhost:9091
+
++step1:
+  prometheus>: template.txt
+      
