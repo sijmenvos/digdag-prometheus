@@ -17,7 +17,7 @@ import com.google.common.base.Throwables;
 
 import io.prometheus.client.exporter.PushGateway;
 import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 
 public class PrometheusOperatorFactory implements OperatorFactory {
     private final TemplateEngine templateEngine;
@@ -44,7 +44,7 @@ public class PrometheusOperatorFactory implements OperatorFactory {
         public TaskResult runTask() {
             Config params = request.getConfig().mergeDefault(
                 request.getConfig().getNestedOrGetEmpty("prometheus"));
-
+            System.out.print(params.get("session_unixtime", Integer.class));
             if (!params.has("pushgateway_url")) {
                 throw new ConfigException("'pushgateway_url' is required");
             }
@@ -52,12 +52,19 @@ public class PrometheusOperatorFactory implements OperatorFactory {
             CollectorRegistry registry = new CollectorRegistry();
             PushGateway pg = new PushGateway(params.get("pushgateway_url", String.class));
 
-            Counter digdag = Counter.build()
-                .name("digdag_total").help("Total digdag tasks.")
-                .labelNames("task")
-                .register();
+            Gauge lastSuccess = Gauge.build()
+                .name("digdag_task_last_success")
+                .help("Last time digdag task succeeded, in unixtime.")
+                .labelNames(
+                    "task_name",
+                    "project_id"
+                )
+                .register(registry);
 
-            digdag.labels(params.get("task_name", String.class)).inc();
+            lastSuccess.labels(
+                params.get("task_name", String.class),
+                params.get("project_id", String.class)
+            ).set(params.get("session_unixtime", Integer.class));
 
             try {
                 pg.pushAdd(registry, "digdag");
