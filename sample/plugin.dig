@@ -4,8 +4,8 @@ _export:
       - file://${repos}
       # - https://jitpack.io
     dependencies:
-      - io.digdag.plugin:digdag-prometheus:0.1.1
-      # - com.github.sijmenvos:digdag-prometheus:0.1.1
+      - io.digdag.plugin:digdag-prometheus:0.1.2
+      # - com.github.sijmenvos:digdag-prometheus:0.1.2
   pushgateway_url: "localhost:9091"
 
 +success:
