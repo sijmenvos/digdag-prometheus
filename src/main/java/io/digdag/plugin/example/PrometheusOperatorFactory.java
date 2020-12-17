@@ -44,7 +44,7 @@ public class PrometheusOperatorFactory implements OperatorFactory {
         public TaskResult runTask() {
             Config params = request.getConfig().mergeDefault(
                 request.getConfig().getNestedOrGetEmpty("prometheus"));
-            System.out.print(params.get("session_unixtime", Integer.class));
+            System.out.print(params);
             if (!params.has("pushgateway_url")) {
                 throw new ConfigException("'pushgateway_url' is required");
             }
@@ -53,21 +53,19 @@ public class PrometheusOperatorFactory implements OperatorFactory {
             PushGateway pg = new PushGateway(params.get("pushgateway_url", String.class));
 
             Gauge lastSuccess = Gauge.build()
-                .name("digdag_task_last_success")
+                .name(params.get("prometheus>", String.class))
                 .help("Last time digdag task succeeded, in unixtime.")
                 .labelNames(
-                    "task_name",
                     "project_id"
                 )
                 .register(registry);
 
             lastSuccess.labels(
-                params.get("task_name", String.class),
                 params.get("project_id", String.class)
             ).set(params.get("session_unixtime", Integer.class));
 
             try {
-                pg.pushAdd(registry, "digdag");
+                pg.pushAdd(registry, params.get("task_name", String.class));
             } catch (IOException ex) {
                 throw Throwables.propagate(ex);
             }

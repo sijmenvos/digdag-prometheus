@@ -1,13 +1,19 @@
 _export:
   plugin:
     repositories:
-      # - file://${repos}
-      - https://jitpack.io
+      - file://${repos}
+      # - https://jitpack.io
     dependencies:
-      # - io.digdag.plugin:digdag-prometheus:0.1.1
-      - com.github.sijmenvos:digdag-prometheus:0.1.1
-  pushgateway_url: localhost:9091
+      - io.digdag.plugin:digdag-prometheus:0.1.1
+      # - com.github.sijmenvos:digdag-prometheus:0.1.1
+  pushgateway_url: "localhost:9091"
 
-+step2:
-  prometheus>: template.txt
-      
++success:
+  _check:
+    prometheus>: "digdag_task_last_success"
+  echo>: "Job completed successfully"
+
++failure:
+  _error:
+    prometheus>: "digdag_task_last_failure"
+  sh>: "exit 1"
