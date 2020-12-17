@@ -27,7 +27,7 @@ Also, you can see expamle workflow at [sample](https://github.com/sijmenvos/digd
       repositories:
         - https://jitpack.io
       dependencies:
-        - com.github.sijmenvos:digdag-prometheus:0.1.2
+        - com.github.sijmenvos:digdag-prometheus:0.1.3
     pushgateway_url: "localhost:9091"
 
   +success:
