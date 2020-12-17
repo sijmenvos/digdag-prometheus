@@ -44,7 +44,7 @@ public class PrometheusOperatorFactory implements OperatorFactory {
         public TaskResult runTask() {
             Config params = request.getConfig().mergeDefault(
                 request.getConfig().getNestedOrGetEmpty("prometheus"));
-            System.out.print(params);
+
             if (!params.has("pushgateway_url")) {
                 throw new ConfigException("'pushgateway_url' is required");
             }
@@ -65,7 +65,7 @@ public class PrometheusOperatorFactory implements OperatorFactory {
             ).set(params.get("session_unixtime", Integer.class));
 
             try {
-                pg.pushAdd(registry, params.get("task_name", String.class));
+                pg.pushAdd(registry, params.get("task_name", String.class).split("\\^")[0]);
             } catch (IOException ex) {
                 throw Throwables.propagate(ex);
             }
